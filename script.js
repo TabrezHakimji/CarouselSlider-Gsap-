@@ -64,7 +64,78 @@ document.addEventListener("click", function () {
     });
 
     splitTextIntoSpans(".slider-content-next h1");
-    gsap.set()
-});
+    gsap.set(".slider-content-next", {
+        top: "0",
+        duration:1.125,
+        ease:"power3.out",
+        onComplete: () => {
+            document.querySelector(".slider-content-next h1 span", {
+                top:0,
+                stagger:0.05,
+                ease:"power3.out",
+                duration:0.5,
+            });
 
+            const nextContent = document.querySelector(".slider-content-next");
+            nextContent.classList.remove("slider-content-next");
+            nextContent.classList.add("slider-content-active");
+            nextContent.style.top = "0";
+
+            currentContentIndex = (currentContentIndex + 1) % totalImages;
+            const nextContentText = sliderContent[currentContentIndex];
+            const newContentHTML = `<div class="slider-content-next" style="top: 200px;"><h1>${nextContentText}</h1></div>`;
+            document.querySelector(".slider-content").insertAdjacentHTML("beforeend", newContentHTML);
+
+        },
+    });
+
+    currentImageIndex = (currentImageIndex % totalImages) + 1;
+
+    const newSlideHTML = `
+        <div class="slide-next">
+            <div class='slide-next-img'>
+                <img src="./assets/${currentImageIndex}.jpg" alt=""/>
+            </div>
+        </div>
+    `;
+
+    document.querySelector(".slider").insertAdjacentHTML("beforeend", newSlideHTML);
+
+
+    gsap.to(".slider .slide-next:last-child .slide-next-img", {
+        clipPath:"polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        duration:1.5,
+        ease:"power3.out",
+        delay:0.5,
+    });
+
+    const slideNextImg = document.querySelector(".slide-next-img");
+    gsap.to(slideNextImg,{
+        width: "100vw",
+        height: "100vh",
+        duration: 2,
+        ease: "power3.out",
+        onComplete: () => {
+            const currentActiveSlide = document.querySelector(".slide-active");
+            if(currentActiveSlide) {
+                currentActiveSlide.parentNode.removeChild(currentActiveSlide);
+            }
+
+            const nextslide = document.querySelector(".slide-next");
+            if(nextslide) {
+                nextslide.classList.remove("slide-next");
+                nextslide.classList.add("slide-active");
+
+                const nextSlideImg = nextslide.querySelector(".slide-next-img");
+                if(nextslide) {
+                    nextSlideImg.classList.remove("slide-next-img");
+                }
+            }
+
+            setTimeout(()=> {
+                isAnimating = false;
+            },500);
+        },
+    });
+});
 
